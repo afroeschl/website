@@ -8,3 +8,10 @@ curl -X POST http://57.129.61.111:3000/data \
      -H "Content-Type: application/json" \
      -d '{"hour":23, "minute":6, "random":42}'
     to manually send data to the server
+
+
+### ToDo
+
+- Globally store login state with express-session
+- Cleanup for GitHub public
+- Chat with upvoting

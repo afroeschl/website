@@ -6,6 +6,12 @@ const path = require("path");
 
 const app = express();
 
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('./db/database.db', (err) => {
+  if (err) console.error("DB Connection Error:", err);
+});
+
+
 // Global storage for input data
 let inputData = {
   startTime: "",
@@ -68,16 +74,44 @@ app.get("/update-input", (req, res) => {
   res.json({ message: "Updated", inputData });
 });
 
-app.post("/login", async (req, res) => {
-    const { password } = req.body;
-    
-    if (!password) return res.status(400).json({ message: "Password required" });
-    const match = await bcrypt.compare(password, hashedPassword);
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ message: "Username and password required" });
+  }
+  db.get("SELECT * FROM users WHERE username = ?", [username], async (err, user) => {
+    if (err) return res.status(500).json({ message: "Internal error" });
+    if (!user) return res.status(401).json({ message: "Invalid credentials" });
+    const match = await bcrypt.compare(password, user.hashedPassword);
     if (match) {
-        res.json({ message: "Access granted!" });
+      res.json({ message: "Access granted!" });
     } else {
-        res.status(401).json({ message: "Wrong password!" });
+      res.status(401).json({ message: "Wrong password!" });
     }
+  });
+});
+
+
+app.post("/register", (req, res) => {
+  const {username, password } = req.body;
+  console.log(username + password)
+  if (!username || !password) {
+    return res.status(400).json({ message: "Username and password required" });
+  }
+  // Check if user exists
+  db.get("SELECT * FROM users WHERE username = ?", [username], (err, user) => {
+    if(err) return res.status(500).json({ message: "Internal error" });
+    if(err) return res.status(409).json({ message: "User already exists" });
+    // Hash password
+    bcrypt.hash(password, 10, (err, hash) => {
+        if (err) return res.status(500).json({ message: "Error hashing password"});
+	// Insert user to db
+	db.run("INSERT INTO users (username, hashedPassword) VALUES (?, ?)", [username, hash], function(err) {
+	    if(err) return res.status(500).json({ message: "Error registering user"});
+	    res.json({message: "User registered successfully" });
+         });
+      });
+   });
 });
 
 
@@ -90,13 +124,16 @@ app.get("/projects", (req, res) => {
   res.render("projects");
 });
 
-
 app.get("/chat", (req, res) => {
   res.render("chat");
 });
 
 app.get("/login", (req, res) => {
   res.render("login");
+});
+
+app.get("/register", (req, res) => {
+  res.render("register");
 });
 
 

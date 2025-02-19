@@ -14,21 +14,25 @@
         <button style="background-color: #404040;" type="submit" id="submit">Submit</button>
     </form>
     <p id="message"></p>
+    <br><br>
+    <p>Not registered? Register here:</p>
+    <a href="http://57.129.61.111:3000/register">
+	<button type="button" id="register">Register</button>
+    </a>
 
     <script>
-        async function login(event) {
-            event.preventDefault();
-            const password = document.getElementById("password").value;
-	    console.log("Inserted password: "+password)
-            const response = await fetch("http://57.129.61.111:3000/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ password })
-            });
-
-            const result = await response.json();
-            document.getElementById("message").textContent = result.message;
-        }
+      async function login(event) {
+        event.preventDefault();
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const response = await fetch("http://57.129.61.111:3000/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+        const result = await response.json();
+        document.getElementById("message").textContent = result.message;
+      }
     </script>
 <%- include('partials/footer') %>
 
