@@ -1,0 +1,58 @@
+<%- include('partials/header', { 
+      title: 'afroeschl', 
+      tailwind: true, 
+      bodyClass: 'bg-black text-gray-300 font-sans' 
+    }) %>
+
+<main class="max-w-2xl mx-auto p-8 space-y-8">
+<h1 class="text-3xl text-gray-400">Andreas Fröschl</h2>
+  <section id="desc">
+    <h2 class="text-2xl text-white">/desc</h2>
+    <p class="text-gray-400">Experimental website of with the purpose of serving as a personal portfolio and a platform for personal projects</p>
+    <p></p>
+  </section>
+
+<section id="about">
+    <h2 class="text-2xl text-white">/about</h2>
+    <p class="text-gray-400">Currently studying EE/IT at TU Vienna</p>
+    <p></p>
+  </section>
+
+
+
+<section id="links">
+  <h2 class="text-2xl text-white">/links</h2>
+  <ul class="mt-4 space-y-4">
+    <li>
+      <a href="https://www.linkedin.com/in/andreas-fr%C3%B6schl-a53b61236" target="_blank" class="flex items-center space-x-2 text-gray-400 hover:text-white">
+        <!-- LinkedIn icon -->
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.783-1.75-1.75s.784-1.75 1.75-1.75 1.75.783 1.75 1.75-.784 1.75-1.75 1.75zm13.5 11.268h-3v-5.604c0-1.337-.027-3.064-1.867-3.064-1.867 0-2.153 1.459-2.153 2.968v5.7h-3v-10h2.881v1.367h.041c.402-.762 1.387-1.562 2.857-1.562 3.054 0 3.623 2.011 3.623 4.626v5.569z"/>
+        </svg>
+        <span>LinkedIn</span>
+      </a>
+    </li>
+    <li>
+      <a href="/cv.pdf" target="_blank" class="flex items-center space-x-2 text-gray-400 hover:text-white">
+        <!-- Document icon for CV -->
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M14 2h-8c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-12l-6-6zm2 18h-10v-16h7v5h5v11zm-3-9h-4v-2h4v2zm0 4h-4v-2h4v2z"/>
+        </svg>
+        <span>CV</span>
+      </a>
+    </li>
+    <li>
+      <a href="https://github.com/afroeschl" target="_blank" class="flex items-center space-x-2 text-gray-400 hover:text-white">
+        <!-- GitHub icon -->
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path fill-rule="evenodd" d="M12 .297a12 12 0 00-3.793 23.393c.6.11.82-.26.82-.577v-2.173c-3.338.725-4.042-1.607-4.042-1.607a3.19 3.19 0 00-1.338-1.754c-1.092-.747.084-.732.084-.732a2.52 2.52 0 011.836 1.233 2.55 2.55 0 003.49.996 2.56 2.56 0 01.764-1.606c-2.665-.3-5.467-1.333-5.467-5.93a4.64 4.64 0 011.24-3.22 4.3 4.3 0 01.12-3.17s1.005-.32 3.3 1.225a11.38 11.38 0 016 0c2.294-1.545 3.297-1.225 3.297-1.225a4.3 4.3 0 01.12 3.17 4.64 4.64 0 011.24 3.22c0 4.608-2.807 5.63-5.478 5.922a2.86 2.86 0 01.822 2.218v3.292c0 .32.218.694.828.576A12 12 0 0012 .297z" clip-rule="evenodd"/>
+        </svg>
+        <span>GitHub</span>
+      </a>
+    </li>
+  </ul>
+</section>
+
+</main>
+<%- include('partials/footer') %>
+
