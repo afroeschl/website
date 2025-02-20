@@ -1,8 +1,10 @@
 const express = require("express");
+const session = require("express-session");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt")
 const path = require("path");
+
 
 const app = express();
 
@@ -11,6 +13,17 @@ const db = new sqlite3.Database('./db/database.db', (err) => {
   if (err) console.error("DB Connection Error:", err);
 });
 
+require('dotenv').config();
+
+
+// Config express-session
+app.use(express.json());
+app.use(session({
+	secret: process.env.SESSION_SECRET,
+	resave: false,
+	saveUninitialized: false,
+	cookie: { secure: false, httpOnly: true }
+}));
 
 // Global storage for input data
 let inputData = {
@@ -20,14 +33,13 @@ let inputData = {
 
 app.use(cors());
 app.use(bodyParser.json());
-const hashedPassword = "$2b$10$Ts2QJ8VWf277d9BGg9TQ5uAExN6k9T.87XGN20ldk721dx3h4IGKy";
 
 
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Serve static files (CSS, JS, images, etc.)
+// Serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
 // Store received sensor data
@@ -47,7 +59,6 @@ app.get("/data", (req, res) => {
 
 // ESP32 fetches static data from the server
 app.get("/get-data", (req, res) => {
-
   console.log("Received data: ", inputData);
 
   // Send a JSON response
@@ -84,7 +95,9 @@ app.post("/login", (req, res) => {
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
     const match = await bcrypt.compare(password, user.hashedPassword);
     if (match) {
-      res.json({ message: "Access granted!" });
+      req.session.userId = user.id;
+      req.session.username = user.username;
+      res.json({ message: "Logged in", username: user.username });
     } else {
       res.status(401).json({ message: "Wrong password!" });
     }
@@ -115,6 +128,25 @@ app.post("/register", (req, res) => {
 });
 
 
+app.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ message: "Logout failed" });
+    }
+    res.json({ message: "Logged out successfully" });
+  });
+});
+
+
+app.get('/session', (req, res) => {
+  if(req.session.userId) {
+    res.json({ loggedIn: true, username: req.session.username });
+  } else {
+    res.json({ loggedIn: false});
+  }
+});
+
+
 // Render EJS views
 app.get("/", (req, res) => {
   res.render("index");
@@ -135,9 +167,6 @@ app.get("/login", (req, res) => {
 app.get("/register", (req, res) => {
   res.render("register");
 });
-
-
-
 
 
 app.listen(3000, () =>

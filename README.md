@@ -11,7 +11,8 @@ curl -X POST http://57.129.61.111:3000/data \
 
 
 ### ToDo
-
 - Globally store login state with express-session
 - Cleanup for GitHub public
 - Chat with upvoting
+- Revise the commands abov
+

@@ -1,1 +1,3 @@
 db/database.db
+.env
+node_modules

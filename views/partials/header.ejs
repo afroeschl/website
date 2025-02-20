@@ -49,8 +49,60 @@
       <path fill-rule="evenodd" d="M12 .297a12 12 0 00-3.793 23.393c.6.11.82-.26.82-.577v-2.173c-3.338.725-4.042-1.607-4.042-1.607a3.19 3.19 0 00-1.338-1.754c-1.092-.747.084-.732.084-.732a2.52 2.52 0 011.836 1.233 2.55 2.55 0 003.49.996 2.56 2.56 0 01.764-1.606c-2.665-.3-5.467-1.333-5.467-5.93a4.64 4.64 0 011.24-3.22 4.3 4.3 0 01.12-3.17s1.005-.32 3.3 1.225a11.38 11.38 0 016 0c2.294-1.545 3.297-1.225 3.297-1.225a4.3 4.3 0 01.12 3.17 4.64 4.64 0 011.24 3.22c0 4.608-2.807 5.63-5.478 5.922a2.86 2.86 0 01.822 2.218v3.292c0 .32.218.694.828.576A12 12 0 0012 .297z" clip-rule="evenodd"></path>
     </svg>
   </a>
-  <a href="/login" class="hover:text-white">Login</a>
+
+  <div id="auth-container">
+      <a href="/login" class="hover:text-white">Login</a>
+    </div>
 </div>
+
+<script>
+    async function checkSession() {
+      const response = await fetch("/session", { credentials: "include" });
+      const result = await response.json();
+      const authContainer = document.getElementById("auth-container");
+
+      if (result.loggedIn) {
+	  authContainer.innerHTML = `Logged in as ${result.username}`;
+	  authContainer.innerHTML += `<button onclick="logout()" class="ml-2 hover:text-red-500">Logout</button>`;
+      } else {
+        authContainer.innerHTML = '<a href="/login" class="hover:text-white">Login</a>';
+      }
+    }
+
+    async function logout() {
+      await fetch("/logout", { method: "POST", credentials: "include" });
+      checkSession();
+    }
+
+    function updateUI() {
+  console.log("updateUI() is defined");
+  const username = localStorage.getItem("username");
+  const loginLink = document.querySelector("a[href='/login']");
+  if (username) {
+    loginLink.textContent = "Logout (" + username + ")";  // ✅ Safe approach
+    loginLink.href = "/logout";
+  } else {
+    loginLink.textContent = "Login";
+    loginLink.href = "/login";
+  }
+}
+
+    async function logout() {
+  const response = await fetch("/logout", { method: "POST", credentials: "include" });
+  if (response.ok) {
+    localStorage.removeItem("username"); // Remove saved username
+    checkSession(); // Refresh UI
+  } else {
+    console.error("Logout failed");
+  }
+}
+
+
+
+
+
+    document.addEventListener("DOMContentLoaded", checkSession);
+  </script>
 
 
   </header>
