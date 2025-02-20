@@ -58,15 +58,15 @@
     </div>
 </div>
 
-<script>
+  <script>
     async function checkSession() {
       const response = await fetch("/session", { credentials: "include" });
       const result = await response.json();
       const authContainer = document.getElementById("auth-container");
 
       if (result.loggedIn) {
-	  authContainer.innerHTML = `Logged in as ${result.username}`;
-	  authContainer.innerHTML += `<button onclick="logout()" class="ml-2 hover:text-red-500">Logout</button>`;
+    authContainer.innerHTML = `Logged in as ${result.username}`;
+    authContainer.innerHTML += `<button onclick="logout()" class="ml-2 hover:text-red-500">Logout</button>`;
       } else {
         authContainer.innerHTML = '<a href="/login" class="hover:text-white">Login</a>';
       }
@@ -78,32 +78,29 @@
     }
 
     function updateUI() {
-  console.log("updateUI() is defined");
-  const username = localStorage.getItem("username");
-  const loginLink = document.querySelector("a[href='/login']");
-  if (username) {
-    loginLink.textContent = "Logout (" + username + ")";  // ✅ Safe approach
-    loginLink.href = "/logout";
-  } else {
-    loginLink.textContent = "Login";
-    loginLink.href = "/login";
-  }
-}
+      console.log("updateUI() is defined");
+      const username = localStorage.getItem("username");
+      const loginLink = document.querySelector("a[href='/login']");
+      if (username) {
+        loginLink.textContent = "Logout (" + username + ")";  // ✅ Safe approach
+        loginLink.href = "/logout";
+      } else {
+        loginLink.textContent = "Login";
+        loginLink.href = "/login";
+      }
+    }
 
     async function logout() {
-  const response = await fetch("/logout", { method: "POST", credentials: "include" });
-  if (response.ok) {
-    localStorage.removeItem("username"); // Remove saved username
-    checkSession(); // Refresh UI
-  } else {
-    console.error("Logout failed");
-  }
-}
-
+      const response = await fetch("/logout", { method: "POST", credentials: "include" });
+      if (response.ok) {
+        localStorage.removeItem("username"); // Remove saved username
+        checkSession(); // Refresh UI
+      } else {
+        console.error("Logout failed");
+      }
+    }
 
     document.addEventListener("DOMContentLoaded", checkSession);
   </script>
-
-
   </header>
 

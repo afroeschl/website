@@ -1,5 +1,5 @@
 <%- include('partials/header', {
-      title: 'auth',
+      title: 'login',
       tailwind: true,
       bodyClass: 'bg-black text-gray-300 font-sans'
     }) %>
@@ -22,25 +22,26 @@
   <button class="btn" id="register">Register</button>
 </a>
 </main>
-    <script>
-      async function login(event) {
-        event.preventDefault();
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
-        const response = await fetch("http://57.129.61.111:3000/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password }),
-	  credentials: "include"
-        });
-        const result = await response.json();
-        document.getElementById("message").textContent = result.message;
-	
-	if (result.username) {
-	  localStorage.setItem("username", result.username);
-	  window.location.href = "/";
-	}
-      }
-    </script>
+<script>
+  async function login(event) {
+    event.preventDefault();
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+    const response = await fetch("http://57.129.61.111:3000/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+        credentials: "include"
+    });
+    const result = await response.json();
+    document.getElementById("message").textContent = result.message;
+
+    if (result.username) {
+      localStorage.setItem("username", result.username);
+      window.location.href = "/";
+    }
+  }
+</script>
+
 <%- include('partials/footer') %>
 

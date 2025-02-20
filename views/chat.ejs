@@ -1,123 +1,123 @@
 <%- include('partials/header', {
-      title: 'sensors',
+      title: 'chat',
       tailwind: true,
       bodyClass: 'bg-black text-gray-300 font-sans'
     }) %>
+<div class="grid h-screen place-items-center">
 
-<main class="max-w-2xl mx-auto p-8 space-y-8">
   <h1 class="text-3xl text-gray-400">Chat</h2>
   
-  <div id="chatContainer" class="border p-4 h-96 overflow-y-scroll bg-gray-900 text-white">
-  
-  </div>
+  <div id="chatContainer" class="border h-96 w-[70vw] overflow-y-scroll bg-gray-900 text-white break-words">
+</div>
+
+
 
   <form onsubmit="return sendMessage(event)">
-    <input type="text" id="message" placeholder="Enter message">
+    <input type="text" id="message" placeholder="Enter message" maxlength="100">
+
     <button id="sendBtn" class="btn">Send</button>
   </form>
-</main>
+</div>
 
 <script>
-	
-	async function loadChatHistory() {
-  try {
-    const response = await fetch("/chat/history", { credentials: "include" });
-    if (!response.ok) {
-      console.error("Failed to load chat history");
-      return;
-    }
-    const messages = await response.json();
-    const container = document.getElementById("chatContainer");
-    container.innerHTML = "";
-    messages.forEach(msg => {
-      appendMessage(msg.id, msg.username, msg.message, msg.timestamp, msg.vote);
-    });
-    container.scrollTop = container.scrollHeight;
-  } catch (error) {
-    console.error("Error loading chat history:", error);
-  }
-}
-
   document.addEventListener("DOMContentLoaded", loadChatHistory);
 
-      async function sendMessage(event) {
-        event.preventDefault();
-        const input = document.getElementById("message");
-        const message = input.value.trim();
-        if (!message) return;
-        
-        // Send message to the server
-        const response = await fetch("/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ message })
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          // Append the new message to the chat container
-          appendMessage(result.username, result.message);
-          input.value = "";
-        } else {
-	  window.location.href = "/login";
-          console.error("Failed to send message");
-        }
+	async function loadChatHistory() {
+    try {
+      const response = await fetch("/chat/history", { credentials: "include" });
+      if (!response.ok) {
+        console.error("Failed to load chat history");
+        return;
       }
+      const messages = await response.json();
+      messages.sort((a,b) => b.vote - a.vote);
+      const container = document.getElementById("chatContainer");
+      container.innerHTML = "";
+      messages.forEach(msg => {
+        appendMessage(msg.id, msg.username, msg.message, msg.timestamp, msg.vote);
+      });
+      container.scrollTop = 0;
+    } catch (error) {
+      console.error("Error loading chat history:", error);
+    }
+  }
 
-function appendMessage(chatId, username, message, timestamp, vote = 0) {
-  const container = document.getElementById("chatContainer");
-  const messageDiv = document.createElement("div");
-  messageDiv.classList.add("chat-message", "mb-2");
-
-  const textSpan = document.createElement("span");
-  // This formats the timestamp; now that it’s in ISO format, it should work correctly.
-  textSpan.textContent = `${username} (${new Date(timestamp).toLocaleTimeString()}): ${message}`;
-
-  const voteSpan = document.createElement("span");
-  voteSpan.id = `vote-${chatId}`;
-  voteSpan.textContent = ` Vote: ${vote} `;
-
-  const upvoteBtn = document.createElement("button");
-  upvoteBtn.textContent = "▲";
-  upvoteBtn.onclick = () => voteOnMessage(chatId, 1);
-
-  const downvoteBtn = document.createElement("button");
-  downvoteBtn.textContent = "▼";
-  downvoteBtn.onclick = () => voteOnMessage(chatId, -1);
-  messageDiv.appendChild(textSpan);
-  messageDiv.appendChild(voteSpan);
-  messageDiv.appendChild(upvoteBtn);
-  messageDiv.appendChild(downvoteBtn);
-  container.appendChild(messageDiv);
-
-  container.scrollTop = container.scrollHeight;
-}
-
-	async function voteOnMessage(chatId, voteValue) {
-  try {
-    const response = await fetch("/chat/vote", {
+  async function sendMessage(event) {
+    event.preventDefault();
+    const input = document.getElementById("message");
+    const message = input.value.trim();
+    if (!message) return;
+    
+    // Send message to the server
+    const response = await fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ chatId, vote: voteValue })
+      body: JSON.stringify({ message })
     });
+    
     if (response.ok) {
       const result = await response.json();
-      const voteSpan = document.getElementById(`vote-${chatId}`);
-      if (voteSpan) {
-        voteSpan.textContent = ` Vote: ${result.vote} `;
-      }
+      // Append the new message to the chat container
+      appendMessage(result.username, result.message);
+      window.location.reload();
+      input.value = "";
     } else {
-      console.error("Vote failed");
+      window.location.href = "/login";
+      console.error("Failed to send message");
     }
-  } catch (error) {
-    console.error("Error in voteOnMessage:", error);
   }
-}
 
+  function appendMessage(chatId, username, message, timestamp, vote = 0) {
+    const container = document.getElementById("chatContainer");
+    const messageDiv = document.createElement("div");
+    messageDiv.classList.add("chat-message", "mb-2");
 
-    </script>
+    const textSpan = document.createElement("span");
+    textSpan.textContent = `${username} (${new Date(timestamp).toLocaleString()}): ${message}`;
+
+    const voteSpan = document.createElement("span");
+    voteSpan.id = `vote-${chatId}`;
+    voteSpan.textContent = ` Vote: ${vote} `;
+
+    const upvoteBtn = document.createElement("button");
+    upvoteBtn.textContent = "▲";
+    upvoteBtn.onclick = () => voteOnMessage(chatId, 1);
+
+    const downvoteBtn = document.createElement("button");
+    downvoteBtn.textContent = "▼";
+    downvoteBtn.onclick = () => voteOnMessage(chatId, -1);
+    messageDiv.appendChild(textSpan);
+    messageDiv.appendChild(voteSpan);
+    messageDiv.appendChild(upvoteBtn);
+    messageDiv.appendChild(downvoteBtn);
+    container.appendChild(messageDiv);
+
+    container.scrollTop = container.scrollHeight;
+  }
+
+  async function voteOnMessage(chatId, voteValue) {
+    try {
+      const response = await fetch("/chat/vote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ chatId, vote: voteValue })
+      });
+      if (response.ok) {
+        const result = await response.json();
+        const voteSpan = document.getElementById(`vote-${chatId}`);
+        if (voteSpan) {
+          voteSpan.textContent = ` Vote: ${result.vote} `;
+        }
+      } else {
+        console.error("Vote failed");
+      }
+    } catch (error) {
+      console.error("Error in voteOnMessage:", error);
+    }
+  }
+</script>
 
 
 <%- include('partials/footer') %>

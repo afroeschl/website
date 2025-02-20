@@ -25,7 +25,6 @@ app.use(session({
 	cookie: { secure: false, httpOnly: true }
 }));
 
-// Global storage for input data
 let inputData = {
   startTime: "",
   endTime: ""
@@ -117,14 +116,14 @@ app.post("/register", (req, res) => {
     if(err) return res.status(409).json({ message: "User already exists" });
     // Hash password
     bcrypt.hash(password, 10, (err, hash) => {
-        if (err) return res.status(500).json({ message: "Error hashing password"});
-	// Insert user to db
-	db.run("INSERT INTO users (username, hashedPassword) VALUES (?, ?)", [username, hash], function(err) {
-	    if(err) return res.status(500).json({ message: "Error registering user"});
-	    res.json({message: "User registered successfully" });
-         });
+      if (err) return res.status(500).json({ message: "Error hashing password"});
+	    // Insert user to db
+	    db.run("INSERT INTO users (username, hashedPassword) VALUES (?, ?)", [username, hash], function(err) {
+	      if(err) return res.status(500).json({ message: "Error registering user"});
+	      res.json({message: "User registered successfully" });
       });
-   });
+    });
+  });
 });
 
 
@@ -152,46 +151,46 @@ function ensureAuthenticated(req, res, next) {
 }
 
 
-
+// POST chat endpoint
 app.post("/chat", (req, res) => {
-  // Check if the user is authenticated
   if (!req.session.userId) {
     return res.status(401).json({ error: "Unauthorized" });
   }
-  
   const { message } = req.body;
   const userId = req.session.userId;
   const username = req.session.username;
-  
-  // Insert the message into the chats table
+
   db.run("INSERT INTO chats (user_id, message) VALUES (?, ?)", [userId, message], function(err) {
     if (err) {
+      console.error("Insert error:", err);
       return res.status(500).json({ error: "Database error" });
     }
+    console.log("Inserted message, lastID:", this.lastID);
     db.get("SELECT * FROM chats WHERE id = ?", [this.lastID], (err, row) => {
-        if (err) {
-          return res.status(500).json({ error: "Database error" });
-        }
-        // Convert timestamp to ISO format if necessary
-        let formattedTimestamp = row.timestamp;
-        if (formattedTimestamp && formattedTimestamp.indexOf("T") === -1) {
-          // For example, convert "2023-09-21 12:34:56" to "2023-09-21T12:34:56"
-          formattedTimestamp = formattedTimestamp.replace(" ", "T");
-        }
-        res.json({
-          id: row.id,
-          username: username,
-          message: row.message,
-          timestamp: formattedTimestamp,
-          vote: row.vote  // should be 0 by default
-        });
+      if (err) {
+        console.error("Query error:", err);
+        return res.status(500).json({ error: "Database error" });
+      }
+      // Format timestamp to ISO if needed
+      let formattedTimestamp = row.timestamp;
+      if (formattedTimestamp && formattedTimestamp.indexOf("T") === -1) {
+        formattedTimestamp = formattedTimestamp.replace(" ", "T");
+      }
+      res.json({
+        id: row.id,
+        username: username,
+        message: row.message,
+        timestamp: formattedTimestamp,
+        vote: row.vote  // defaults to 0
       });
-    }
-  );
+    });
+  });
 });
 
+
+
 // Load chat history
-app.get("/chat/history", ensureAuthenticated, (req, res) => {
+app.get("/chat/history", (req, res) => {
   const query = `
     SELECT chats.id, chats.message, chats.timestamp, chats.vote, users.username 
     FROM chats 
@@ -210,8 +209,9 @@ app.get("/chat/history", ensureAuthenticated, (req, res) => {
 
 // Voting endpoint
 app.post("/chat/vote", (req, res) => {
-  // Ensure user is authenticated
+  console.log("Vote endpoint session: "+ req.session);
   if (!req.session.userId) {
+    console.error("Unauthorized access, no session userId");
     return res.status(401).json({ error: "Unauthorized" });
   }
   const { chatId, vote } = req.body; // enter 1 or -1
@@ -245,7 +245,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/projects", (req, res) => {
-  res.render("projects");
+  res.render("projects", { username: req.session.username });
 });
 
 app.get("/chat", (req, res) => {
@@ -264,4 +264,3 @@ app.get("/register", (req, res) => {
 app.listen(3000, () =>
   console.log("Server running on 57.129.61.111:3000")
 );
-

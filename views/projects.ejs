@@ -13,9 +13,12 @@
   <input type="text" id="endTime" placeholder="Enter endTime hh:mm">
   <br>
   <button id="confirmBtn" class="btn">Confirm</button>
+  <p id="message"></p>
 
 </main>
 <script>
+  const username = "<%= username %>";
+
   async function fetchData() {
     try {
       const response = await fetch("/data");
@@ -29,25 +32,29 @@
   window.onload = fetchData;
  
   // Send UI data to the server for storage
-document.getElementById("confirmBtn").addEventListener("click", () => {
-  event.preventDefault();
-  const startTime = document.getElementById("startTime").value;
-  const endTime = document.getElementById("endTime").value;
+  document.getElementById("confirmBtn").addEventListener("click", () => {
+    event.preventDefault();
+    const startTime = document.getElementById("startTime").value;
+    const endTime = document.getElementById("endTime").value;
 
-  const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
-  if (!timePattern.test(startTime) || !timePattern.test(endTime)) {
-    alert("Please enter valid times in HH:MM format (e.g., 09:30 or 23:45)");
-    return;
-  }
+    if (!timePattern.test(startTime) || !timePattern.test(endTime)) {
+      alert("Please enter valid times in HH:MM format (e.g., 09:30 or 23:45)");
+      return;
+    }
+    if (username != "admin") {
+      console.error("Not authorized");
+      document.getElementById("message").textContent = "Not authorized";
+    }
 
-  console.log("Sending data:", startTime, endTime); // Debugging step
+    console.log("Sending data:", startTime, endTime);
 
-  fetch(`/update-input?startTime=${encodeURIComponent(startTime)}&endTime=${encodeURIComponent(endTime)}`)
-    .then(response => response.json())
-    .then(data => console.log("Server response:", data)) // Check server response
-    .catch(error => console.error("Error:", error));
+    fetch(`/update-input?startTime=${encodeURIComponent(startTime)}&endTime=${encodeURIComponent(endTime)}`)
+      .then(response => response.json())
+      .then(data => console.log("Server response:", data)) // Check server response
+      .catch(error => console.error("Error:", error));
   });
 </script>
-<%- include('partials/footer') %>
 
+<%- include('partials/footer') %>

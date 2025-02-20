@@ -1,18 +1,21 @@
-node server.js
+<code>node server.js</code>
+
     to manually run the server
 
-curl -v http://57.129.61.111:3000/get-data
+<code>curl -v http://57.129.61.111:3000/get-data</code>
+
     to manually get the data the server is sending
 
-curl -X POST http://57.129.61.111:3000/data \
+<code>curl -X POST http://57.129.61.111:3000/data \
      -H "Content-Type: application/json" \
-     -d '{"hour":23, "minute":6, "random":42}'
+     -d '{"hour":23, "minute":6, "random":42}'</code>
+
     to manually send data to the server
 
+***
 
-### ToDo
-- Globally store login state with express-session
+## ToDo
 - Cleanup for GitHub public
-- Chat with upvoting
-- Revise the commands abov
-
+- Fix vote count to 1 per user/comment
+- Fix wrong display of comment after commenting - reload needed rn
+- Revise commands above
