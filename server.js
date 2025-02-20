@@ -147,6 +147,43 @@ app.get('/session', (req, res) => {
 });
 
 
+
+app.post("/chat", (req, res) => {
+  // Check if the user is authenticated
+  if (!req.session.userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  
+  const { message } = req.body;
+  const userId = req.session.userId;
+  
+  // Insert the message into the chats table
+  db.run("INSERT INTO chats (user_id, message) VALUES (?, ?)", [userId, message], function(err) {
+    if (err) {
+      return res.status(500).json({ error: "Database error" });
+    }
+    // Optionally, get additional information
+    const username = req.session.username;
+    res.json({ id: this.lastID, username, message, timestamp: new Date() });
+  });
+});
+
+// Load chat history
+app.get("/chat/history", ensureAuthenticated, (req, res) => {
+  const query = `
+    SELECT chats.id, chats.message, chats.timestamp, users.username 
+    FROM chats 
+    JOIN users ON chats.user_id = users.id 
+    ORDER BY chats.timestamp ASC
+  `;
+  db.all(query, [], (err, rows) => {
+    if (err) return res.status(500).json({ error: "Database error" });
+    res.json(rows);
+  });
+});
+
+
+
 // Render EJS views
 app.get("/", (req, res) => {
   res.render("index");

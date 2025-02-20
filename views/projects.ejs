@@ -1,58 +1,20 @@
 <%- include('partials/header', {
-      title: 'sensors',
+      title: 'projects',
       tailwind: true,
       bodyClass: 'bg-black text-gray-300 font-sans'
     }) %>
 
-
-<style>
-    .container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-    }
-
-    input {
-        background-color: grey;
-        color: white;
-        border: none;
-        padding: 10px;
-        margin: 5px;
-        font-size: 16px;
-        border-radius: 5px;
-        text-align: center;
-    }
-
-    button {
-        background-color: white;
-        color: black;
-        padding: 10px 15px;
-        margin-top: 10px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-</style>
-
-
-<div class="container">
+<main class="max-w-2xl mx-auto p-8 space-y-8">
   <h1 class="text-3xl text-gray-400">ESP32 Data</h2>
   <p>2-way communication with an ESP32 via GET and POST requests</p>
-  <br><br>
-  <br><br>
-  <br><br>
   <pre id="data">Loading...</pre>
-  <br><br>
-  <br><br>
   <input type="text" id="startTime" placeholder="Enter startTime hh:mm">
-  <br><br>
+  <br>
   <input type="text" id="endTime" placeholder="Enter endTime hh:mm">
-  <br><br>
-  <button id="confirmBtn">Confirm</button>
+  <br>
+  <button id="confirmBtn" class="btn">Confirm</button>
 
-</div>
+</main>
 <script>
   async function fetchData() {
     try {

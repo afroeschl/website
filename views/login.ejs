@@ -4,22 +4,24 @@
       bodyClass: 'bg-black text-gray-300 font-sans'
     }) %>
 
-<h2>Login</h2>
 <br>
-    <form onsubmit="return login(event)">
-	<input id="username" placeholder="Enter username" required>
-	<br></br>
-        <input type="password" id="password" placeholder="Enter password" required>
-	<br></br>
-        <button style="background-color: #404040;" type="submit" id="submit">Submit</button>
-    </form>
-    <p id="message"></p>
-    <br><br>
-    <p>Not registered? Register here:</p>
-    <a href="http://57.129.61.111:3000/register">
-	<button type="button" id="register">Register</button>
-    </a>
-
+<main class="max-w-2xl mx-auto p-8 space-y-8">
+<h1 class="text-3xl text-gray-400">Login</h2>
+<br>
+<form onsubmit="return login(event)">
+  <input id="username" placeholder="Enter username" required>
+  <br></br>
+  <input type="password" id="password" placeholder="Enter password" required>
+  <br></br>
+  <button id="submit" class="btn">Submit</button>
+</form>
+<p id="message"></p>
+<br>
+<p>Not registered? Register here:</p>
+<a href="http://57.129.61.111:3000/register">
+  <button class="btn" id="register">Register</button>
+</a>
+</main>
     <script>
       async function login(event) {
         event.preventDefault();
