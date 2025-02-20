@@ -146,6 +146,11 @@ app.get('/session', (req, res) => {
   }
 });
 
+function ensureAuthenticated(req, res, next) {
+  if (req.session.userId) return next();
+  res.redirect("/login");
+}
+
 
 
 app.post("/chat", (req, res) => {
@@ -156,29 +161,79 @@ app.post("/chat", (req, res) => {
   
   const { message } = req.body;
   const userId = req.session.userId;
+  const username = req.session.username;
   
   // Insert the message into the chats table
   db.run("INSERT INTO chats (user_id, message) VALUES (?, ?)", [userId, message], function(err) {
     if (err) {
       return res.status(500).json({ error: "Database error" });
     }
-    // Optionally, get additional information
-    const username = req.session.username;
-    res.json({ id: this.lastID, username, message, timestamp: new Date() });
-  });
+    db.get("SELECT * FROM chats WHERE id = ?", [this.lastID], (err, row) => {
+        if (err) {
+          return res.status(500).json({ error: "Database error" });
+        }
+        // Convert timestamp to ISO format if necessary
+        let formattedTimestamp = row.timestamp;
+        if (formattedTimestamp && formattedTimestamp.indexOf("T") === -1) {
+          // For example, convert "2023-09-21 12:34:56" to "2023-09-21T12:34:56"
+          formattedTimestamp = formattedTimestamp.replace(" ", "T");
+        }
+        res.json({
+          id: row.id,
+          username: username,
+          message: row.message,
+          timestamp: formattedTimestamp,
+          vote: row.vote  // should be 0 by default
+        });
+      });
+    }
+  );
 });
 
 // Load chat history
 app.get("/chat/history", ensureAuthenticated, (req, res) => {
   const query = `
-    SELECT chats.id, chats.message, chats.timestamp, users.username 
+    SELECT chats.id, chats.message, chats.timestamp, chats.vote, users.username 
     FROM chats 
     JOIN users ON chats.user_id = users.id 
     ORDER BY chats.timestamp ASC
   `;
   db.all(query, [], (err, rows) => {
-    if (err) return res.status(500).json({ error: "Database error" });
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
     res.json(rows);
+  });
+});
+
+
+// Voting endpoint
+app.post("/chat/vote", (req, res) => {
+  // Ensure user is authenticated
+  if (!req.session.userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  const { chatId, vote } = req.body; // enter 1 or -1
+  if (![1, -1].includes(vote)) {
+    return res.status(400).json({ error: "Invalid vote value" });
+  }
+
+  // Update vote column
+  const sql = `UPDATE chats SET vote = vote + ? WHERE id = ?`;
+  db.run(sql, [vote, chatId], function(err) {
+    if (err) {
+      console.error("Vote error:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+    // Retrieve updated vote total
+    db.get("SELECT vote FROM chats WHERE id = ?", [chatId], (err, row) => {
+      if (err) {
+        console.error("Query error:", err);
+        return res.status(500).json({ error: "Database error" });
+      }
+      res.json({ chatId, vote: row.vote });
+    });
   });
 });
 

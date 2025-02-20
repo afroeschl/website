@@ -1,33 +1,49 @@
-/* styles/main.css */
+:root {
+  --bg-main: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-hover: #30363d;
+  --text-color: #c9d1d9;
+  --border-color: #30363d;
+  --button-bg: #21262d;
+  --button-hover: #30363d;
+  --input-bg: #0d1117;
+  --input-border: #30363d;
+}
+
 body {
-  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-color);
+  font-family: Arial, sans-serif;
 }
 
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-input {
-  background-color: grey;
-  color: white;
-  border: none;
-  padding: 10px;
-  margin: 5px;
-  font-size: 16px;
-  border-radius: 5px;
-  text-align: center;
+/* Input Field (GitHub-style search bar) */
+input, textarea {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border: 1px solid var(--input-border);
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: border 0.2s ease-in-out;
 }
 
-button {
-  background-color: white;
-  color: black;
-  padding: 10px 15px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 5px;
+input:focus, textarea:focus {
+  border-color: var(--text-color);
+  outline: none;
+}
+
+.btn {
+  background-color: var(--button-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s;
+}
+
+.btn:hover {
+  background-color: var(--button-hover);
+  border-color: var(--text-color);
 }
 
