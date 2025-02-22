@@ -3,18 +3,16 @@
       tailwind: true,
       bodyClass: 'bg-black text-gray-300 font-sans'
     }) %>
+
 <div class="grid h-screen place-items-center">
-
   <h1 class="text-3xl text-gray-400">Chat</h2>
-  
-  <div id="chatContainer" class="border h-96 w-[70vw] overflow-y-scroll bg-gray-900 text-white break-words">
-</div>
+  <p id="error" class="text-red-500"> </p>
+  <div id="chatContainer" class="border h-[75vh] w-[70vw] overflow-y-scroll overflow-x-hidden bg-gray-900 text-white">
 
-
+  </div>
 
   <form onsubmit="return sendMessage(event)">
     <input type="text" id="message" placeholder="Enter message" maxlength="100">
-
     <button id="sendBtn" class="btn">Send</button>
   </form>
 </div>
@@ -48,7 +46,7 @@
     const message = input.value.trim();
     if (!message) return;
     
-    // Send message to the server
+    // Send message to server
     const response = await fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -58,9 +56,7 @@
     
     if (response.ok) {
       const result = await response.json();
-      // Append the new message to the chat container
-      appendMessage(result.username, result.message);
-      window.location.reload();
+      appendMessage(result.id, result.username, result.message, result.timestamp);
       input.value = "";
     } else {
       window.location.href = "/login";
@@ -69,32 +65,56 @@
   }
 
   function appendMessage(chatId, username, message, timestamp, vote = 0) {
-    const container = document.getElementById("chatContainer");
-    const messageDiv = document.createElement("div");
-    messageDiv.classList.add("chat-message", "mb-2");
+  const container = document.getElementById("chatContainer");
+  const messageDiv = document.createElement("div");
+  messageDiv.classList.add("chat-message", "mb-2", "p-1", "bg-gray-800", "rounded", "flex", "justify-between", "items-center");
 
-    const textSpan = document.createElement("span");
-    textSpan.textContent = `${username} (${new Date(timestamp).toLocaleString()}): ${message}`;
+  // Text container
+  const textContainer = document.createElement("div");
+  textContainer.classList.add("flex-1", "break-all");
 
-    const voteSpan = document.createElement("span");
-    voteSpan.id = `vote-${chatId}`;
-    voteSpan.textContent = ` Vote: ${vote} `;
+  
+  const header = document.createElement("div");
+  header.classList.add("text-sm", "text-gray-400");
+  header.innerHTML = `<span class="font-bold text-blue-400">${username}</span> <span class="italic">(${new Date(timestamp).toLocaleString()})</span>`;
+  
+  const body = document.createElement("div");
+  body.classList.add("text-lg", "text-white");
+  body.textContent = message;
+  
+  textContainer.appendChild(header);
+  textContainer.appendChild(body);
 
-    const upvoteBtn = document.createElement("button");
-    upvoteBtn.textContent = "▲";
-    upvoteBtn.onclick = () => voteOnMessage(chatId, 1);
+  // Vote container
+  const voteContainer = document.createElement("div");
+  voteContainer.classList.add("flex", "items-center", "ml-4", "space-x-1");
 
-    const downvoteBtn = document.createElement("button");
-    downvoteBtn.textContent = "▼";
-    downvoteBtn.onclick = () => voteOnMessage(chatId, -1);
-    messageDiv.appendChild(textSpan);
-    messageDiv.appendChild(voteSpan);
-    messageDiv.appendChild(upvoteBtn);
-    messageDiv.appendChild(downvoteBtn);
-    container.appendChild(messageDiv);
+  const voteSpan = document.createElement("span");
+  voteSpan.id = `vote-${chatId}`;
+  voteSpan.textContent = `${vote}`;
+  voteSpan.classList.add("text=xs", "mb-1");
 
-    container.scrollTop = container.scrollHeight;
-  }
+  const upvoteBtn = document.createElement("button");
+  upvoteBtn.textContent = "▲";
+  upvoteBtn.classList.add("text-s", "p-0.5", "bg-transparent", "hover:bg-gray-700", "rounded");
+  upvoteBtn.onclick = () => voteOnMessage(chatId, 1);
+
+  const downvoteBtn = document.createElement("button");
+  downvoteBtn.textContent = "▼";
+  downvoteBtn.classList.add("text-s", "p-0.5", "bg-transparent", "hover:bg-gray-700", "rounded");
+  downvoteBtn.onclick = () => voteOnMessage(chatId, -1);
+
+  voteContainer.appendChild(upvoteBtn);
+  voteContainer.appendChild(voteSpan);
+  voteContainer.appendChild(downvoteBtn);
+
+  messageDiv.appendChild(textContainer);
+  messageDiv.appendChild(voteContainer);
+  
+  container.appendChild(messageDiv);
+  container.scrollTop = container.scrollHeight;
+}
+
 
   async function voteOnMessage(chatId, voteValue) {
     try {
@@ -108,15 +128,32 @@
         const result = await response.json();
         const voteSpan = document.getElementById(`vote-${chatId}`);
         if (voteSpan) {
-          voteSpan.textContent = ` Vote: ${result.vote} `;
+          voteSpan.textContent = `${result.vote} `;
         }
+        refreshChatOrder();
       } else {
+        document.getElementById("error").textContent = "Login is required to vote";
         console.error("Vote failed");
       }
     } catch (error) {
       console.error("Error in voteOnMessage:", error);
     }
   }
+
+
+  function refreshChatOrder() {
+    const container = document.getElementById("chatContainer");
+    const messages = Array.from(container.children);
+
+    messages.sort((a, b) => {
+        const voteA = parseInt(a.querySelector("span[id^='vote-']").textContent.match(/[-\d]+/)[0]);
+        const voteB = parseInt(b.querySelector("span[id^='vote-']").textContent.match(/[-\d]+/)[0]);
+        return voteB - voteA;
+    });
+
+    messages.forEach(msg => container.appendChild(msg));
+}
+
 </script>
 
 

@@ -195,7 +195,7 @@ app.get("/chat/history", (req, res) => {
     SELECT chats.id, chats.message, chats.timestamp, chats.vote, users.username 
     FROM chats 
     JOIN users ON chats.user_id = users.id 
-    ORDER BY chats.timestamp ASC
+    ORDER BY chats.vote DESC, chats.timestamp
   `;
   db.all(query, [], (err, rows) => {
     if (err) {

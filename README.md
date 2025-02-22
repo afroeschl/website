@@ -19,3 +19,4 @@
 - Fix vote count to 1 per user/comment
 - Fix wrong display of comment after commenting - reload needed rn
 - Revise commands above
+- Auth for esp time edit not working
