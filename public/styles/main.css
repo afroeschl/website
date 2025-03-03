@@ -47,3 +47,6 @@ input:focus, textarea:focus {
   border-color: var(--text-color);
 }
 
+.btn.active {
+  color: #ff0000;
+}

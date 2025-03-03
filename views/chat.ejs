@@ -27,13 +27,15 @@
         console.error("Failed to load chat history");
         return;
       }
+      
       const messages = await response.json();
       messages.sort((a,b) => b.vote - a.vote);
       const container = document.getElementById("chatContainer");
       container.innerHTML = "";
       messages.forEach(msg => {
-        appendMessage(msg.id, msg.username, msg.message, msg.timestamp, msg.vote);
-      });
+        console.log("UserVote: "+ msg.userVote);
+        appendMessage(msg.id, msg.username, msg.message, msg.timestamp, msg.vote, msg.userVote || 0);
+    });
       container.scrollTop = 0;
     } catch (error) {
       console.error("Error loading chat history:", error);
@@ -62,9 +64,9 @@
       window.location.href = "/login";
       console.error("Failed to send message");
     }
-  }
+}
 
-  function appendMessage(chatId, username, message, timestamp, vote = 0) {
+function appendMessage(chatId, username, message, timestamp, vote = 0, userVote = 0) {
   const container = document.getElementById("chatContainer");
   const messageDiv = document.createElement("div");
   messageDiv.classList.add("chat-message", "mb-2", "p-1", "bg-gray-800", "rounded", "flex", "justify-between", "items-center");
@@ -73,7 +75,6 @@
   const textContainer = document.createElement("div");
   textContainer.classList.add("flex-1", "break-all");
 
-  
   const header = document.createElement("div");
   header.classList.add("text-sm", "text-gray-400");
   header.innerHTML = `<span class="font-bold text-blue-400">${username}</span> <span class="italic">(${new Date(timestamp).toLocaleString()})</span>`;
@@ -92,28 +93,45 @@
   const voteSpan = document.createElement("span");
   voteSpan.id = `vote-${chatId}`;
   voteSpan.textContent = `${vote}`;
-  voteSpan.classList.add("text=xs", "mb-1");
+  voteSpan.classList.add("text-xs", "mb-1");
 
-  const upvoteBtn = document.createElement("button");
-  upvoteBtn.textContent = "▲";
-  upvoteBtn.classList.add("text-s", "p-0.5", "bg-transparent", "hover:bg-gray-700", "rounded");
-  upvoteBtn.onclick = () => voteOnMessage(chatId, 1);
+    // Create upvote button
+    const upvoteBtn = document.createElement("button");
+    upvoteBtn.id = `upvote-${chatId}`;
+    upvoteBtn.textContent = "▲";
+    upvoteBtn.onclick = () => voteOnMessage(chatId, 1);
 
-  const downvoteBtn = document.createElement("button");
-  downvoteBtn.textContent = "▼";
-  downvoteBtn.classList.add("text-s", "p-0.5", "bg-transparent", "hover:bg-gray-700", "rounded");
-  downvoteBtn.onclick = () => voteOnMessage(chatId, -1);
+    // Create downvote button
+    const downvoteBtn = document.createElement("button");
+    downvoteBtn.id = `downvote-${chatId}`;
+    downvoteBtn.textContent = "▼";
+    downvoteBtn.onclick = () => voteOnMessage(chatId, -1);
 
-  voteContainer.appendChild(upvoteBtn);
-  voteContainer.appendChild(voteSpan);
-  voteContainer.appendChild(downvoteBtn);
+    console.log("USERVOTE BUT IN AppendMessage: "+userVote);
+    if (userVote === parseInt(1)) {
+        console.log("UPVOTE");
+        upvoteBtn.classList.add("text-s", "p-0.5", "bg-green-500", "hover:bg-gray-700", "rounded");
+        downvoteBtn.classList.add("text-s", "p-0.5", "bg-transparent", "hover:bg-gray-700", "rounded");
+    } else if (userVote === parseInt(-1)) {
+        console.log("DOWNVOTE");
+        upvoteBtn.classList.add("text-s", "p-0.5", "bg-transparent", "hover:bg-gray-700", "rounded");
+        downvoteBtn.classList.add("text-s", "p-0.5", "bg-red-500", "hover:bg-gray-700", "rounded");
+    } else {
+        upvoteBtn.classList.add("text-s", "p-0.5", "bg-transparent", "hover:bg-gray-700", "rounded");
+        downvoteBtn.classList.add("text-s", "p-0.5", "bg-transparent", "hover:bg-gray-700", "rounded");
+    }
+    
+    voteContainer.appendChild(upvoteBtn);
+    voteContainer.appendChild(voteSpan);
+    voteContainer.appendChild(downvoteBtn);
 
-  messageDiv.appendChild(textContainer);
-  messageDiv.appendChild(voteContainer);
-  
-  container.appendChild(messageDiv);
-  container.scrollTop = container.scrollHeight;
+    messageDiv.appendChild(textContainer);
+    messageDiv.appendChild(voteContainer);
+    
+    container.appendChild(messageDiv);
+    container.scrollTop = container.scrollHeight;
 }
+
 
 
   async function voteOnMessage(chatId, voteValue) {
@@ -125,13 +143,62 @@
         body: JSON.stringify({ chatId, vote: voteValue })
       });
       if (response.ok) {
+        const upvoteBtn = document.getElementById(`upvote-${chatId}`);
+        const downvoteBtn = document.getElementById(`downvote-${chatId}`);
+        
+
         const result = await response.json();
         const voteSpan = document.getElementById(`vote-${chatId}`);
+
+        /*
+        if (userVote === parseInt(1)) {
+        console.log("UPVOTE");
+        upvoteBtn.classList.add("text-s", "p-0.5", "bg-green-500", "hover:bg-gray-700", "rounded");
+        downvoteBtn.classList.add("text-s", "p-0.5", "bg-transparent", "hover:bg-gray-700", "rounded");
+    } else if (userVote === parseInt(-1)) {
+        console.log("DOWNVOTE");
+        upvoteBtn.classList.add("text-s", "p-0.5", "bg-transparent", "hover:bg-gray-700", "rounded");
+        downvoteBtn.classList.add("text-s", "p-0.5", "bg-red-500", "hover:bg-gray-700", "rounded");
+    } else {
+        upvoteBtn.classList.add("text-s", "p-0.5", "bg-transparent", "hover:bg-gray-700", "rounded");
+        downvoteBtn.classList.add("text-s", "p-0.5", "bg-transparent", "hover:bg-gray-700", "rounded");
+    }
+        
+*/      
+
+       
+        upvoteBtn.classList.remove("bg-green-500", "hover:bg-gray-700");
+        downvoteBtn.classList.remove("bg-red-500", "hover:bg-gray-700");
+
+        upvoteBtn.classList.remove("bg-transparent", "hover:bg-gray-700");
+        downvoteBtn.classList.remove("bg-transparent", "hover:bg-gray-700");
+
+        if (result.toggle) {
+            console.log("TOGGLE");
+        
+            upvoteBtn.classList.add("bg-transparent", "hover:bg-gray-700");
+            downvoteBtn.classList.add("bg-transparent", "hover:bg-gray-700");
+        } else {
+            if (voteValue === 1) {
+                console.log("no toggle, upvote");
+
+                upvoteBtn.classList.add("bg-green-500", "hover:bg-gray-700");
+                downvoteBtn.classList.add("bg-transparent", "hover:bg-gray-700");
+            } else if (voteValue === -1) {
+                console.log("no toggle, downvote");
+
+                upvoteBtn.classList.add("bg-transparent", "hover:bg-gray-700");
+                downvoteBtn.classList.add("bg-red-500", "hover:bg-gray-700");
+            }
+        }
+            
+        
         if (voteSpan) {
-          voteSpan.textContent = `${result.vote} `;
+            voteSpan.textContent = `${result.vote} `;
         }
         refreshChatOrder();
       } else {
+        console.log(response);
         document.getElementById("error").textContent = "Login is required to vote";
         console.error("Vote failed");
       }
@@ -141,7 +208,7 @@
   }
 
 
-  function refreshChatOrder() {
+function refreshChatOrder() {
     const container = document.getElementById("chatContainer");
     const messages = Array.from(container.children);
 

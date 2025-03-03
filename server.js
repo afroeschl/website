@@ -171,7 +171,7 @@ app.post("/chat", (req, res) => {
         console.error("Query error:", err);
         return res.status(500).json({ error: "Database error" });
       }
-      // Format timestamp to ISO if needed
+      // Format timestamp to ISO
       let formattedTimestamp = row.timestamp;
       if (formattedTimestamp && formattedTimestamp.indexOf("T") === -1) {
         formattedTimestamp = formattedTimestamp.replace(" ", "T");
@@ -181,7 +181,7 @@ app.post("/chat", (req, res) => {
         username: username,
         message: row.message,
         timestamp: formattedTimestamp,
-        vote: row.vote  // defaults to 0
+        vote: row.vote
       });
     });
   });
@@ -191,19 +191,21 @@ app.post("/chat", (req, res) => {
 
 // Load chat history
 app.get("/chat/history", (req, res) => {
-  const query = `
-    SELECT chats.id, chats.message, chats.timestamp, chats.vote, users.username 
-    FROM chats 
-    JOIN users ON chats.user_id = users.id 
-    ORDER BY chats.vote DESC, chats.timestamp
+    const userId = req.session.userId || 0;
+    const query = `
+        SELECT chats.id, chats.message, chats.timestamp, chats.vote, users.username,
+        (SELECT vote FROM votes WHERE chat_id = chats.id AND user_id = ?) AS userVote
+        FROM chats 
+        JOIN users ON chats.user_id = users.id 
+        ORDER BY chats.vote DESC, chats.timestamp
   `;
-  db.all(query, [], (err, rows) => {
-    if (err) {
-      console.error("Database error:", err);
-      return res.status(500).json({ error: "Database error" });
-    }
-    res.json(rows);
-  });
+    db.all(query, [userId], (err, rows) => {
+        if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ error: "Database error" });
+        }
+        res.json(rows);
+    });
 });
 
 
@@ -211,33 +213,88 @@ app.get("/chat/history", (req, res) => {
 app.post("/chat/vote", (req, res) => {
   console.log("Vote endpoint session: "+ req.session);
   if (!req.session.userId) {
-    console.error("Unauthorized access, no session userId");
     return res.status(401).json({ error: "Unauthorized" });
   }
-  const { chatId, vote } = req.body; // enter 1 or -1
-  if (![1, -1].includes(vote)) {
+
+  const { chatId, vote } = req.body; // validate 1 or -1
+  if (![1, 0, -1].includes(vote)) {
     return res.status(400).json({ error: "Invalid vote value" });
   }
 
-  // Update vote column
-  const sql = `UPDATE chats SET vote = vote + ? WHERE id = ?`;
-  db.run(sql, [vote, chatId], function(err) {
-    if (err) {
-      console.error("Vote error:", err);
-      return res.status(500).json({ error: "Database error" });
-    }
-    // Retrieve updated vote total
-    db.get("SELECT vote FROM chats WHERE id = ?", [chatId], (err, row) => {
-      if (err) {
-        console.error("Query error:", err);
+  const userId = req.session.userId;
+
+  // Check if user has already voted
+  db.get(`SELECT vote FROM votes WHERE user_id = ? AND chat_id = ?`, [userId, chatId], (err, row) => {
+    if(err){
         return res.status(500).json({ error: "Database error" });
-      }
-      res.json({ chatId, vote: row.vote });
-    });
+    }
+
+    // Case 1: vote exists
+    if (row){
+        if (vote === 0){
+            db.run(`DELETE FROM votes WHERE user_id = ? AND chat_id = ?`, [userId, chatId], (err, row) => {
+                if (err){
+                    console.error("Update error:", err);
+                    return res.status(500).json({ error: "Database error" });
+                }
+                updateChatVoteCount(false);
+            });
+        } else {
+            if (row.vote === vote) {
+                // If same, delete the vote (i.e., reset it to 0)
+                db.run("DELETE FROM votes WHERE user_id = ? AND chat_id = ?", [userId, chatId], (err) => {
+                if (err) {
+                    console.error("Delete error:", err);
+                    return res.status(500).json({ error: "Database error" });
+                }
+                updateChatVoteCount(true);
+                });
+            } else {
+                // Otherwise, update the vote to the new value
+                db.run("UPDATE votes SET vote = ? WHERE user_id = ? AND chat_id = ?", [vote, userId, chatId], (err) => {
+                if (err) {
+                    console.error("Update error:", err);
+                    return res.status(500).json({ error: "Database error" });
+                }
+                updateChatVoteCount(false);
+                });
+            }
+        }
+    // Case 2: vote doesn't exist
+    } else {
+        console.log("vote doesnt exist");
+        if (vote !== 0) {
+            db.run("INSERT INTO votes (user_id, chat_id, vote) VALUES (?, ?, ?)", [userId, chatId, vote], function(err) {
+            if (err) {
+                console.error("Insert error:", err);
+                return res.status(500).json({ error: "Database error" });
+            }
+            updateChatVoteCount(false);
+            });
+        } else {
+            // Vote is 0 and no previous vote exists – nothing to do
+            updateChatVoteCount(false);
+    };
+}
+
+function updateChatVoteCount(toggle) {
+      db.get("SELECT COALESCE(SUM(vote), 0) AS totalVote FROM votes WHERE chat_id = ?", [chatId], (err, row) => {
+        if (err) {
+          console.error("Sum query error:", err);
+          return res.status(500).json({ error: "Database error" });
+        }
+        // Optionally, update the chats table to reflect the new total vote
+        db.run("UPDATE chats SET vote = ? WHERE id = ?", [row.totalVote, chatId], function(err) {
+          if (err) {
+            console.error("Update chat vote error:", err);
+            return res.status(500).json({ error: "Database error" });
+          }
+          res.json({ chatId, vote: row.totalVote, toggle });
+        });
+      });
+    }
   });
 });
-
-
 
 // Render EJS views
 app.get("/", (req, res) => {

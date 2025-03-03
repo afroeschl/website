@@ -29,6 +29,17 @@ db.serialize(() => {
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   )`);
 
+  // Cretae vites table
+  db.run(`CREATE TABLE IF NOT EXISTS votes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  chat_id INTEGER NOT NULL,
+  vote INTEGER NOT NULL,
+  UNIQUE(user_id, chat_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (chat_id) REFERENCES chats(id) ON DELETE CASCADE
+)`);
+
   // Insert users
   const password = "defaultPassword";
   bcrypt.hash(password, 10, (err, hash) => {
