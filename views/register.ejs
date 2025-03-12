@@ -8,34 +8,34 @@
 <h1 class="text-3xl text-gray-400">Register</h2>
 <br>
 <form onsubmit="return registerUser(event)">
-	<input id="username" placeholder="Enter username" required>
-	<br><br>
-	<input id="password" placeholder="Enter password" required>
-	<br><br>
-	<p><b>Disclaimer:</b> All data entered in this website is transmitted without guaranteed security. Avoid sharing sensitive information. By registering, you accept these risks. </p>
-	<br>
-	<button class="btn" id="submit">Register</button>
+    <input id="username" placeholder="Enter username" required>
+    <br><br>
+    <input id="password" placeholder="Enter password" required>
+    <br><br>
+    <p><b>Disclaimer:</b> All data entered in this website is transmitted without guaranteed security. Avoid sharing sensitive information. By registering, you accept these risks. </p>
+    <br>
+    <button class="btn" id="submit">Register</button>
 </form>
 <p id="message"></p>
 </main>
 
 <script>
     async function registerUser(event) {
-	event.preventDefault();
-	const username = document.getElementById("username").value;
-    	const password = document.getElementById("password").value;
-    	const response = await fetch("/register", {
-	    method: "POST",
-	    headers: { "Content-Type": "application/json" },
-	    body: JSON.stringify({ username, password })
-	});
+        event.preventDefault();
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const response = await fetch("/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
 
-	const result = await response.json();
-	document.getElementById("message").textContent = result.message;
-	
-	if (response.ok) {
-	  window.location.href = "/login"
-	}
+        const result = await response.json();
+        document.getElementById("message").textContent = result.message;
+
+        if (response.ok) {
+            window.location.href = "/login"
+        }
     }
 </script>
 

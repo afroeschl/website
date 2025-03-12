@@ -5,44 +5,41 @@
     }) %>
 
 <div class="grid h-screen place-items-center">
-  <h1 class="text-3xl text-gray-400">Chat</h2>
-  <p id="error" class="text-red-500"> </p>
-  <div id="chatContainer" class="border h-[75vh] w-[70vw] overflow-y-scroll overflow-x-hidden bg-gray-900 text-white">
+    <h1 class="text-3xl text-gray-400">Chat</h2>
+    <p id="error" class="text-red-500"> </p>
+    <div id="chatContainer" class="border h-[75vh] w-[70vw] overflow-y-scroll overflow-x-hidden bg-gray-900 text-white"></div>
 
-  </div>
-
-  <form onsubmit="return sendMessage(event)">
-    <input type="text" id="message" placeholder="Enter message" maxlength="100">
-    <button id="sendBtn" class="btn">Send</button>
-  </form>
+    <form onsubmit="return sendMessage(event)">
+        <input type="text" id="message" placeholder="Enter message" maxlength="100">
+        <button id="sendBtn" class="btn">Send</button>
+    </form>
 </div>
 
 <script>
   document.addEventListener("DOMContentLoaded", loadChatHistory);
 
-	async function loadChatHistory() {
+    async function loadChatHistory() {
     try {
-      const response = await fetch("/chat/history", { credentials: "include" });
-      if (!response.ok) {
-        console.error("Failed to load chat history");
-        return;
-      }
-      
-      const messages = await response.json();
-      messages.sort((a,b) => b.vote - a.vote);
-      const container = document.getElementById("chatContainer");
-      container.innerHTML = "";
-      messages.forEach(msg => {
-        console.log("UserVote: "+ msg.userVote);
-        appendMessage(msg.id, msg.username, msg.message, msg.timestamp, msg.vote, msg.userVote || 0);
-    });
-      container.scrollTop = 0;
+        const response = await fetch("/chat/history", { credentials: "include" });
+        if (!response.ok) {
+            console.error("Failed to load chat history");
+            return;
+        }
+        const messages = await response.json();
+        messages.sort((a,b) => b.vote - a.vote);
+        const container = document.getElementById("chatContainer");
+        container.innerHTML = "";
+        messages.forEach(msg => {
+            console.log("UserVote: "+ msg.userVote);
+            appendMessage(msg.id, msg.username, msg.message, msg.timestamp, msg.vote, msg.userVote || 0);
+        });
+        container.scrollTop = 0;
     } catch (error) {
-      console.error("Error loading chat history:", error);
+        console.error("Error loading chat history:", error);
     }
-  }
+}
 
-  async function sendMessage(event) {
+async function sendMessage(event) {
     event.preventDefault();
     const input = document.getElementById("message");
     const message = input.value.trim();
@@ -50,50 +47,50 @@
     
     // Send message to server
     const response = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ message })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ message })
     });
     
     if (response.ok) {
-      const result = await response.json();
-      appendMessage(result.id, result.username, result.message, result.timestamp);
-      input.value = "";
+        const result = await response.json();
+        appendMessage(result.id, result.username, result.message, result.timestamp);
+        input.value = "";
     } else {
-      window.location.href = "/login";
-      console.error("Failed to send message");
+        window.location.href = "/login";
+        console.error("Failed to send message");
     }
 }
 
 function appendMessage(chatId, username, message, timestamp, vote = 0, userVote = 0) {
-  const container = document.getElementById("chatContainer");
-  const messageDiv = document.createElement("div");
-  messageDiv.classList.add("chat-message", "mb-2", "p-1", "bg-gray-800", "rounded", "flex", "justify-between", "items-center");
+    const container = document.getElementById("chatContainer");
+    const messageDiv = document.createElement("div");
+    messageDiv.classList.add("chat-message", "mb-2", "p-1", "bg-gray-800", "rounded", "flex", "justify-between", "items-center");
 
-  // Text container
-  const textContainer = document.createElement("div");
-  textContainer.classList.add("flex-1", "break-all");
+    // Text container
+    const textContainer = document.createElement("div");
+    textContainer.classList.add("flex-1", "break-all");
 
-  const header = document.createElement("div");
-  header.classList.add("text-sm", "text-gray-400");
-  header.innerHTML = `<span class="font-bold text-blue-400">${username}</span> <span class="italic">(${new Date(timestamp).toLocaleString()})</span>`;
-  
-  const body = document.createElement("div");
-  body.classList.add("text-lg", "text-white");
-  body.textContent = message;
-  
-  textContainer.appendChild(header);
-  textContainer.appendChild(body);
+    const header = document.createElement("div");
+    header.classList.add("text-sm", "text-gray-400");
+    header.innerHTML = `<span class="font-bold text-blue-400">${username}</span> <span class="italic">(${new Date(timestamp).toLocaleString()})</span>`;
 
-  // Vote container
-  const voteContainer = document.createElement("div");
-  voteContainer.classList.add("flex", "items-center", "ml-4", "space-x-1");
+    const body = document.createElement("div");
+    body.classList.add("text-lg", "text-white");
+    body.textContent = message;
 
-  const voteSpan = document.createElement("span");
-  voteSpan.id = `vote-${chatId}`;
-  voteSpan.textContent = `${vote}`;
-  voteSpan.classList.add("text-xs", "mb-1");
+    textContainer.appendChild(header);
+    textContainer.appendChild(body);
+
+    // Vote container
+    const voteContainer = document.createElement("div");
+    voteContainer.classList.add("flex", "items-center", "ml-4", "space-x-1");
+
+    const voteSpan = document.createElement("span");
+    voteSpan.id = `vote-${chatId}`;
+    voteSpan.textContent = `${vote}`;
+    voteSpan.classList.add("text-xs", "mb-1");
 
     // Create upvote button
     const upvoteBtn = document.createElement("button");
@@ -132,81 +129,59 @@ function appendMessage(chatId, username, message, timestamp, vote = 0, userVote 
     container.scrollTop = container.scrollHeight;
 }
 
-
-
-  async function voteOnMessage(chatId, voteValue) {
+async function voteOnMessage(chatId, voteValue) {
     try {
-      const response = await fetch("/chat/vote", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ chatId, vote: voteValue })
-      });
-      if (response.ok) {
-        const upvoteBtn = document.getElementById(`upvote-${chatId}`);
-        const downvoteBtn = document.getElementById(`downvote-${chatId}`);
-        
-
-        const result = await response.json();
-        const voteSpan = document.getElementById(`vote-${chatId}`);
-
-        /*
-        if (userVote === parseInt(1)) {
-        console.log("UPVOTE");
-        upvoteBtn.classList.add("text-s", "p-0.5", "bg-green-500", "hover:bg-gray-700", "rounded");
-        downvoteBtn.classList.add("text-s", "p-0.5", "bg-transparent", "hover:bg-gray-700", "rounded");
-    } else if (userVote === parseInt(-1)) {
-        console.log("DOWNVOTE");
-        upvoteBtn.classList.add("text-s", "p-0.5", "bg-transparent", "hover:bg-gray-700", "rounded");
-        downvoteBtn.classList.add("text-s", "p-0.5", "bg-red-500", "hover:bg-gray-700", "rounded");
-    } else {
-        upvoteBtn.classList.add("text-s", "p-0.5", "bg-transparent", "hover:bg-gray-700", "rounded");
-        downvoteBtn.classList.add("text-s", "p-0.5", "bg-transparent", "hover:bg-gray-700", "rounded");
-    }
-        
-*/      
-
-       
-        upvoteBtn.classList.remove("bg-green-500", "hover:bg-gray-700");
-        downvoteBtn.classList.remove("bg-red-500", "hover:bg-gray-700");
-
-        upvoteBtn.classList.remove("bg-transparent", "hover:bg-gray-700");
-        downvoteBtn.classList.remove("bg-transparent", "hover:bg-gray-700");
-
-        if (result.toggle) {
-            console.log("TOGGLE");
-        
-            upvoteBtn.classList.add("bg-transparent", "hover:bg-gray-700");
-            downvoteBtn.classList.add("bg-transparent", "hover:bg-gray-700");
-        } else {
-            if (voteValue === 1) {
-                console.log("no toggle, upvote");
-
-                upvoteBtn.classList.add("bg-green-500", "hover:bg-gray-700");
-                downvoteBtn.classList.add("bg-transparent", "hover:bg-gray-700");
-            } else if (voteValue === -1) {
-                console.log("no toggle, downvote");
-
-                upvoteBtn.classList.add("bg-transparent", "hover:bg-gray-700");
-                downvoteBtn.classList.add("bg-red-500", "hover:bg-gray-700");
-            }
-        }
+        const response = await fetch("/chat/vote", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ chatId, vote: voteValue })
+        });
+        if (response.ok) {
+            const upvoteBtn = document.getElementById(`upvote-${chatId}`);
+            const downvoteBtn = document.getElementById(`downvote-${chatId}`);
             
+            const result = await response.json();
+            const voteSpan = document.getElementById(`vote-${chatId}`);
         
-        if (voteSpan) {
-            voteSpan.textContent = `${result.vote} `;
-        }
-        refreshChatOrder();
-      } else {
-        console.log(response);
-        document.getElementById("error").textContent = "Login is required to vote";
-        console.error("Vote failed");
-      }
-    } catch (error) {
-      console.error("Error in voteOnMessage:", error);
-    }
-  }
+            upvoteBtn.classList.remove("bg-green-500", "hover:bg-gray-700");
+            downvoteBtn.classList.remove("bg-red-500", "hover:bg-gray-700");
 
+            upvoteBtn.classList.remove("bg-transparent", "hover:bg-gray-700");
+            downvoteBtn.classList.remove("bg-transparent", "hover:bg-gray-700");
+
+            if (result.toggle) {
+                console.log("TOGGLE");
+            
+                upvoteBtn.classList.add("bg-transparent", "hover:bg-gray-700");
+                downvoteBtn.classList.add("bg-transparent", "hover:bg-gray-700");
+            } else {
+                if (voteValue === 1) {
+                    console.log("no toggle, upvote");
+
+                    upvoteBtn.classList.add("bg-green-500", "hover:bg-gray-700");
+                    downvoteBtn.classList.add("bg-transparent", "hover:bg-gray-700");
+                } else if (voteValue === -1) {
+                    console.log("no toggle, downvote");
+
+                    upvoteBtn.classList.add("bg-transparent", "hover:bg-gray-700");
+                    downvoteBtn.classList.add("bg-red-500", "hover:bg-gray-700");
+                }
+            }   
+            
+            if (voteSpan) {
+                voteSpan.textContent = `${result.vote} `;
+            }
+            refreshChatOrder();
+        } else {
+            console.log(response);
+            document.getElementById("error").textContent = "Login is required to vote";
+            console.error("Vote failed");
+        }
+    } catch (error) {
+        console.error("Error in voteOnMessage:", error);
+    }
+}
 
 function refreshChatOrder() {
     const container = document.getElementById("chatContainer");
@@ -220,9 +195,6 @@ function refreshChatOrder() {
 
     messages.forEach(msg => container.appendChild(msg));
 }
-
 </script>
 
-
 <%- include('partials/footer') %>
-

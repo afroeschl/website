@@ -2,103 +2,98 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title || "Site" %></title>
-  <link href="/styles/output.css" rel="stylesheet">
-  <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
-  <link rel="shortcut icon" href="/favicon/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
-  <meta name="apple-mobile-web-app-title" content="afroeschl" />
-  <link rel="manifest" href="/favicon/site.webmanifest" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || "Site" %></title>
+    <link href="/styles/output.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="afroeschl" />
+    <link rel="manifest" href="/favicon/site.webmanifest" />
 
-  <!-- SEO Meta Tags -->
-  <meta name="description" content="Personal website of afroeschl">
-  <meta name="author" content="afroeschl">
-  <meta name="theme-color" content="#000000">
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Personal website of afroeschl">
+    <meta name="author" content="afroeschl">
+    <meta name="theme-color" content="#000000">
 
-  <!-- Keywords: Relevant search terms -->
+    <!-- Keywords: Relevant search terms -->
     <meta name="keywords" content="afroeschl, Andreas Fröschl, Software Engineering, GitHub, LinkedIn,Portfolio, Electrical Engineer">
 
-  <!-- Open Graph / Facebook -->
-  <meta property="og:title" content="<%= title || 'Site' %>">
-  <meta property="og:description" content="Personal website of afroeschl">
-  <meta property="og:image" content="/favicon/favicon.svg">
-  <meta property="og:type" content="website">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="<%= title || 'Site' %>">
+    <meta property="og:description" content="Personal website of afroeschl">
+    <meta property="og:image" content="/favicon/favicon.svg">
+    <meta property="og:type" content="website">
 
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="<%= title || 'Site' %>">
-  <meta name="twitter:description" content="Personal website of afroeschl">
-  <meta name="twitter:image" content="/favicon/favicon.svg">
-
-  <link rel="stylesheet" href="/styles/main.css">
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= title || 'Site' %>">
+    <meta name="twitter:description" content="Personal website of afroeschl">
+    <meta name="twitter:image" content="/favicon/favicon.svg">
 </head>
+
 <body>
-  <header class="flex justify-between items-center p-4 border-b border-gray-700">
-    <nav class="flex gap-4">
-      <a href="/" class="hover:text-white">Home</a>
-      <a href="/projects" class="hover:text-white">Projects</a>
-      <a href="/chat" class="hover:text-white">Chat</a>
- 
-    </nav>
-    
-    <div class="flex justify-end space-x-4">
-  <a href="https://github.com/afroeschl" target="_blank" class="text-gray-300 hover:text-white">
-    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-      <path fill-rule="evenodd" d="M12 .297a12 12 0 00-3.793 23.393c.6.11.82-.26.82-.577v-2.173c-3.338.725-4.042-1.607-4.042-1.607a3.19 3.19 0 00-1.338-1.754c-1.092-.747.084-.732.084-.732a2.52 2.52 0 011.836 1.233 2.55 2.55 0 003.49.996 2.56 2.56 0 01.764-1.606c-2.665-.3-5.467-1.333-5.467-5.93a4.64 4.64 0 011.24-3.22 4.3 4.3 0 01.12-3.17s1.005-.32 3.3 1.225a11.38 11.38 0 016 0c2.294-1.545 3.297-1.225 3.297-1.225a4.3 4.3 0 01.12 3.17 4.64 4.64 0 011.24 3.22c0 4.608-2.807 5.63-5.478 5.922a2.86 2.86 0 01.822 2.218v3.292c0 .32.218.694.828.576A12 12 0 0012 .297z" clip-rule="evenodd"></path>
-    </svg>
-  </a>
+    <header class="flex justify-between items-center p-4 border-b border-gray-700">
+        <nav class="flex gap-4">
+            <a href="/" class="hover:text-white">Home</a>
+            <a href="/projects" class="hover:text-white">Projects</a>
+            <a href="/chat" class="hover:text-white">Chat</a>
+        </nav>
+        
+        <div class="flex justify-end space-x-4">
+            <a href="https://github.com/afroeschl" target="_blank" class="text-gray-300 hover:text-white">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M12 .297a12 12 0 00-3.793 23.393c.6.11.82-.26.82-.577v-2.173c-3.338.725-4.042-1.607-4.042-1.607a3.19 3.19 0 00-1.338-1.754c-1.092-.747.084-.732.084-.732a2.52 2.52 0 011.836 1.233 2.55 2.55 0 003.49.996 2.56 2.56 0 01.764-1.606c-2.665-.3-5.467-1.333-5.467-5.93a4.64 4.64 0 011.24-3.22 4.3 4.3 0 01.12-3.17s1.005-.32 3.3 1.225a11.38 11.38 0 016 0c2.294-1.545 3.297-1.225 3.297-1.225a4.3 4.3 0 01.12 3.17 4.64 4.64 0 011.24 3.22c0 4.608-2.807 5.63-5.478 5.922a2.86 2.86 0 01.822 2.218v3.292c0 .32.218.694.828.576A12 12 0 0012 .297z" clip-rule="evenodd"></path>
+                </svg>
+            </a>
 
-  <div id="auth-container">
-      <a href="/login" class="hover:text-white">Login</a>
-    </div>
-</div>
+            <div id="auth-container">
+                <a href="/login" class="hover:text-white">Login</a>
+            </div>
+        </div>
+        <script>
+            async function checkSession() {
+                const response = await fetch("/session", { credentials: "include" });
+                const result = await response.json();
+                const authContainer = document.getElementById("auth-container");
 
-  <script>
-    async function checkSession() {
-      const response = await fetch("/session", { credentials: "include" });
-      const result = await response.json();
-      const authContainer = document.getElementById("auth-container");
+                if (result.loggedIn) {
+                    authContainer.innerHTML = `Logged in as ${result.username}`;
+                    authContainer.innerHTML += `<button onclick="logout()" class="ml-2 hover:text-red-500">Logout</button>`;
+                } else {
+                    authContainer.innerHTML = '<a href="/login" class="hover:text-white">Login</a>';
+                }
+            }
 
-      if (result.loggedIn) {
-    authContainer.innerHTML = `Logged in as ${result.username}`;
-    authContainer.innerHTML += `<button onclick="logout()" class="ml-2 hover:text-red-500">Logout</button>`;
-      } else {
-        authContainer.innerHTML = '<a href="/login" class="hover:text-white">Login</a>';
-      }
-    }
+            async function logout() {
+                await fetch("/logout", { method: "POST", credentials: "include" });
+                checkSession();
+            }
 
-    async function logout() {
-      await fetch("/logout", { method: "POST", credentials: "include" });
-      checkSession();
-    }
+            function updateUI() {
+                console.log("updateUI() is defined");
+                const username = localStorage.getItem("username");
+                const loginLink = document.querySelector("a[href='/login']");
+                if (username) {
+                    loginLink.textContent = "Logout (" + username + ")";
+                    loginLink.href = "/logout";
+                } else {
+                    loginLink.textContent = "Login";
+                    loginLink.href = "/login";
+                }
+            }
 
-    function updateUI() {
-      console.log("updateUI() is defined");
-      const username = localStorage.getItem("username");
-      const loginLink = document.querySelector("a[href='/login']");
-      if (username) {
-        loginLink.textContent = "Logout (" + username + ")";  // ✅ Safe approach
-        loginLink.href = "/logout";
-      } else {
-        loginLink.textContent = "Login";
-        loginLink.href = "/login";
-      }
-    }
-
-    async function logout() {
-      const response = await fetch("/logout", { method: "POST", credentials: "include" });
-      if (response.ok) {
-        localStorage.removeItem("username"); // Remove saved username
-        checkSession(); // Refresh UI
-      } else {
-        console.error("Logout failed");
-      }
-    }
-
-    document.addEventListener("DOMContentLoaded", checkSession);
-  </script>
-  </header>
-
+            async function logout() {
+                const response = await fetch("/logout", { method: "POST", credentials: "include" });
+                if (response.ok) {
+                    localStorage.removeItem("username"); // Remove saved username
+                    checkSession(); // Refresh UI
+                } else {
+                    console.error("Logout failed");
+                }
+            }
+            document.addEventListener("DOMContentLoaded", checkSession);
+        </script>
+    </header>
