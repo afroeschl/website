@@ -1,3 +1,9 @@
+# Personal website with some other stuff in it
+So far no domain, accessible via
+<code>http://57.129.61.111:3000</code>
+
+# Instructions
+
 <code>node server.js</code>
 
     to manually run the server
