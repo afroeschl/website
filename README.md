@@ -28,6 +28,4 @@ So far no domain, accessible via
 ***
 
 ## ToDo
-- Cleanup for GitHub public
-- Revise commands above
 - Implement auth for esp communication
