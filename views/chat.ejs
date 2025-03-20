@@ -6,6 +6,7 @@
 
 <div class="grid h-screen place-items-center">
     <h1 class="text-3xl text-gray-400">Chat</h2>
+    <p>This chat is currently locked to prevent unwanted activity.</p>
     <p id="error" class="text-red-500"> </p>
     <div id="chatContainer" class="border h-[75vh] w-[70vw] overflow-y-scroll overflow-x-hidden bg-gray-900 text-white"></div>
 
@@ -58,8 +59,9 @@ async function sendMessage(event) {
         appendMessage(result.id, result.username, result.message, result.timestamp);
         input.value = "";
     } else {
-        window.location.href = "/login";
+        //window.location.href = "/login";
         console.error("Failed to send message");
+        document.getElementById("error").textContent = "Failed to send message.";
     }
 }
 

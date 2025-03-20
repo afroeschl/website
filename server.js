@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt")
 const path = require("path");
 const app = express();
+const fs = require('fs');
 
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('./db/database.db', (err) => {
@@ -20,6 +21,17 @@ app.use(session({
     saveUninitialized: false,
     cookie: { secure: false, httpOnly: true }
 }));
+
+// Access logging
+app.use((req, res, next) => {
+    if (req.url === '/get-data' || req.url === '/data' || req.url === '/styles/output.css') {
+        return next();
+    }
+
+    const logEntry = `${new Date().toISOString()} - ${req.ip} - ${req.method} ${req.url}\n`;
+    fs.appendFileSync('access.log', logEntry);
+    next();
+});
 
 let inputData = {
     startTime: "",
@@ -139,7 +151,8 @@ app.get('/session', (req, res) => {
 
 // POST chat endpoint
 app.post("/chat", (req, res) => {
-    if (!req.session.userId) {
+    if (!req.session.userId || req.session.userId != 1) {
+        console.log("UserId: "+req.session.userId);
         return res.status(401).json({ error: "Unauthorized" });
     }
     const { message } = req.body;
